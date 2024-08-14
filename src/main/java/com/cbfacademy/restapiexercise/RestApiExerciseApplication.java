@@ -1,4 +1,4 @@
-package com.cbfacademy.restapiexercise;
+package com.cbfacademy.restapiexercise.ious;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
