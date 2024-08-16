@@ -38,9 +38,19 @@ public class IOU {
         this.dateTime = dateTime;
     }
 
+    // Define a default UUID - suggested by Kelly -CBF group member
+    private static final UUID DEFAULT_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
+
     // creating getters and setters for each field, except id, which should only have a getter
-    public UUID getId(){
-        return this.id;
+    // public UUID getId(){
+    //     return this.id;
+    // }
+
+
+    //- suggested by Kelly -CBF group member
+    public UUID getId() {
+
+        return id != null ? id : DEFAULT_UUID;
     }
 
 
@@ -76,7 +86,7 @@ public class IOU {
     }    
 
     public void setDateTime(Instant dataTime){
-        this.dateTime = dateTime;
+
     }
 
 }

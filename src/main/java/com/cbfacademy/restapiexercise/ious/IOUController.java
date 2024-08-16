@@ -14,10 +14,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -26,12 +29,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class IOUController {
   private final IOUService iouService;
 
-    public IOUController(IOUService iouService) { // iouService class injected as a dependency
-    this.iouService = iouService;
+  // iouService class injected as a dependency
+  public IOUController(IOUService iouService) { 
+  this.iouService = iouService;
   }
   
   // amended 12 8 2024 - 
   // Extend the getIOUS method of your controller to accept an optional query string parameter, e.g.: getIOUs(@RequestParam(required = false) String borrower)
+  // Retrieve a list of (optionally filtered) IOUs
   @GetMapping(produces = "application/json")
   public List<IOU> getALLIOUs(@RequestParam(required = false) String borrower) {
       if (borrower != null) {
@@ -43,22 +48,50 @@ public class IOUController {
       }
   }
 
-
+  // Retrieve a specific IOU by its ID
   @GetMapping(value = "/{id}", produces = "application/json")
   public IOU getIOU(@PathVariable UUID id) {
       return iouService.getIOU(id);
   }
 
+  // Create a new IOU - my original code
+
+  // @PostMapping(produces = "application/json")
+  // public IOU createIou(@RequestBody IOU iou) {
+  //   return iouService.createIOU(iou);
+  // }
+
+  // Create a new IOU - amendments after speaking to Kelly - group member CBF
+  // added  @ResponseStatus(HttpStatus.CREATED)
+  @ResponseStatus(HttpStatus.CREATED) // sets the HTTP status code to 201 CREATED for the response regardless of the return type.It eliminates the need to use ResponseEntity to set the status code manually.
   @PostMapping(produces = "application/json")
   public IOU createIou(@RequestBody IOU iou) {
-    return iouService.createIOU (iou);
+    return iouService.createIOU(iou);
   }
 
+  
+//   // Create a new IOU - from Kelly - group member CBF - was not working as createdIOU cannot be resolved to a variable. added the createdIou variable in order to call the iouService.createIOU(iou) method to create the IOU object and then return it in the ResponseEntity.
+  @PostMapping(produces = "application/json")
+  public ResponseEntity<IOU> createIOU(@RequestBody IOU iou) {
+    IOU createdIou = iouService.createIOU(iou);
+      return new ResponseEntity<>(createdIou, HttpStatus.CREATED);
+  }  
+
+// //   // copilot
+// @PostMapping(produces = "application/json")
+// public ResponseEntity<IOU> createIou(@RequestBody IOU iou) {
+//     IOU createdIou = iouService.createIOU(iou);
+//     return ResponseEntity.status(HttpStatus.CREATED).body(createdIou);
+// }
+
+
+  // Update an existing IOU by ID
   @PutMapping(value = "/{id}", produces = "application/json")
   public IOU updateIOU(@PathVariable UUID id, @RequestBody IOU updatedIOU) {
       return iouService.updateIOU(id, updatedIOU);
   }
 
+  // Delete an IOU by ID
   @DeleteMapping(value = "/{id}", produces = "application/json")
   public void deleteIOU(@PathVariable UUID id) {
       iouService.deleteIOU(id);
