@@ -47,7 +47,8 @@ public class IOUService {
 
   // d. IOU updateIOU(UUID id, IOU updatedIOU) throws NoSuchElementException
   public IOU updateIOU(UUID id, IOU updatedIOU) throws NoSuchElementException {
-    IOU existingIOU = iouRepository.findById(id).orElseThrow(() -> new NoSuchElementException("IOU not found"));
+//    IOU existingIOU = iouRepository.findById(id).orElseThrow(() -> new NoSuchElementException("IOU not found"));
+    IOU existingIOU = getIOU(id);
     existingIOU.setLender(updatedIOU.getLender());      
     existingIOU.setAmount(updatedIOU.getAmount());
     existingIOU.setBorrower(updatedIOU.getBorrower());

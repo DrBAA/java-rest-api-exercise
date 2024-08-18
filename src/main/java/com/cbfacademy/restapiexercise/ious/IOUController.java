@@ -9,6 +9,7 @@
 
 package com.cbfacademy.restapiexercise.ious;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,25 +38,55 @@ public class IOUController {
   this.iouService = iouService;
   }
   
-  // amended 12 8 2024 - 
+  // amended 18 8 2024 - 
   // Extend the getIOUS method of your controller to accept an optional query string parameter, e.g.: getIOUs(@RequestParam(required = false) String borrower)
   // Retrieve a list of (optionally filtered) IOUs
+
   @GetMapping(produces = "application/json")
-  public List<IOU> getALLIOUs(@RequestParam(required = false) String borrower) {
-      if (borrower != null) {
-          // Call the filtered service method based on the borrower value
-          return iouService.getIOUsByBorrower(borrower);
-      } else {
-          // Call the existing service method (getAllIOUs)
-          return iouService.getAllIOUs();
-      }
+  
+  public ResponseEntity<List<IOU>> getAllIOUs(@RequestParam(required = false) String borrower){
+    if (borrower == null || borrower.isEmpty()) {
+      List<IOU>ious=iouService.getAllIOUs();// call service method to getAllIous
+        return ResponseEntity.ok(ious); //return 200 ok with iou
+    }            
+    else {
+          List<IOU> ious=iouService.getIOUsByBorrower(borrower); //call service method to filter by browser
+          return ResponseEntity.ok(ious);
+          }
   }
+  
+  // added 12 8 2024
+  // @GetMapping(produces = "application/json")
+  // public List<IOU> getALLIOUs(@RequestParam(required = false) String borrower) {
+  //     if (borrower != null) {
+  //         // Call the filtered service method based on the borrower value
+  //         return iouService.getIOUsByBorrower(borrower);
+  //     } else {
+  //         // Call the existing service method (getAllIOUs)
+  //         return iouService.getAllIOUs();
+  //     }
+  // }
 
   // Retrieve a specific IOU by its ID
-  @GetMapping(value = "/{id}", produces = "application/json")
-  public IOU getIOU(@PathVariable UUID id) {
-      return iouService.getIOU(id);
-  }
+    @GetMapping(value="/{id}", produces = "application/json" )
+    public ResponseEntity <IOU> getIOU(@PathVariable UUID id){
+           try{
+             IOU iou = iouService.getIOU(id);
+             if(iou != null){
+            return ResponseEntity.ok(iou); //return 200 ok with iou
+        }else{
+            return ResponseEntity.notFound().build(); //return 404 not found
+        }
+        } catch (NoSuchElementException e) {
+          return ResponseEntity.notFound().build(); // Handle case where IOU is not found
+        }
+    }
+
+  // // Retrieve a specific IOU by its ID
+  // @GetMapping(value = "/{id}", produces = "application/json")
+  // public IOU getIOU(@PathVariable UUID id) {
+  //     return iouService.getIOU(id);
+  // }
 
   // Create a new IOU - my original code
 
@@ -74,11 +105,11 @@ public class IOUController {
 
   
 //   // Create a new IOU - from Kelly - group member CBF - was not working as createdIOU cannot be resolved to a variable. added the createdIou variable in order to call the iouService.createIOU(iou) method to create the IOU object and then return it in the ResponseEntity.
-  @PostMapping(produces = "application/json")
-  public ResponseEntity<IOU> createIOU(@RequestBody IOU iou) {
-    IOU createdIou = iouService.createIOU(iou);
-      return new ResponseEntity<>(createdIou, HttpStatus.CREATED);
-  }  
+  // @PostMapping(produces = "application/json")
+  // public ResponseEntity<IOU> createIOU(@RequestBody IOU iou) {
+  //   IOU createdIou = iouService.createIOU(iou);
+  //     return new ResponseEntity<>(createdIou, HttpStatus.CREATED);
+  // }  
 
 // //   // copilot
 // @PostMapping(produces = "application/json")
@@ -87,18 +118,41 @@ public class IOUController {
 //     return ResponseEntity.status(HttpStatus.CREATED).body(createdIou);
 // }
 
+  // Update an existing IOU by ID
+  @PutMapping(value="/{id}", produces = "application/json")
+  public ResponseEntity<IOU> updateIou(@PathVariable UUID id, @RequestBody IOU iou) {
+      try{
+      IOU updatedIou =iouService.updateIOU(id,iou);
+        return ResponseEntity.ok(updatedIou); //return 200 ok with iou
+      }catch (NoSuchElementException e) {
+       return ResponseEntity.notFound().build();
+      }
+}
+
 
   // Update an existing IOU by ID
-  @PutMapping(value = "/{id}", produces = "application/json")
-  public IOU updateIOU(@PathVariable UUID id, @RequestBody IOU updatedIOU) {
-      return iouService.updateIOU(id, updatedIOU);
-  }
+  // @PutMapping(value = "/{id}", produces = "application/json")
+  // public IOU updateIOU(@PathVariable UUID id, @RequestBody IOU updatedIOU) {
+  //     return iouService.updateIOU(id, updatedIOU);
+  // }
+
 
   // Delete an IOU by ID
-  @DeleteMapping(value = "/{id}", produces = "application/json")
-  public void deleteIOU(@PathVariable UUID id) {
-      iouService.deleteIOU(id);
-  } 
+  @DeleteMapping(value="/{id}",produces ="application/json")
+  public ResponseEntity <Void> deleteIou(@PathVariable UUID id) {
+   try {
+    iouService.deleteIOU(id);
+      return ResponseEntity.ok().build(); //return 200 ok with iou
+    } catch (NoSuchElementException e) {
+       return ResponseEntity.notFound().build();
+   }
+  }
+
+  // // Delete an IOU by ID
+  // @DeleteMapping(value = "/{id}", produces = "application/json")
+  // public void deleteIOU(@PathVariable UUID id) {
+  //     iouService.deleteIOU(id);
+  // } 
 
 }
 
