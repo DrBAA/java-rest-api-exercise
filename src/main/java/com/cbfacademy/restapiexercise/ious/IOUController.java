@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -27,9 +28,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/ious") //sets the base path for all endpoints in this controller. Any request URI handled by this class will start with "/api/books". Therefore, each method’s path is relative to this base path. This approach helps avoid repetition and makes the code cleaner and easier to maintain.
 
 public class IOUController {
-  private final IOUService iouService;
 
   // iouService class injected as a dependency
+  @Autowired  
+  private final IOUService iouService;
+ 
   public IOUController(IOUService iouService) { 
   this.iouService = iouService;
   }
