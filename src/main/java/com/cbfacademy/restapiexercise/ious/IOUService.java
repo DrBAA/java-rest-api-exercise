@@ -33,7 +33,14 @@ public class IOUService {
   }
 
   // copilot - added 12 8 2024.
+  // amended 24 8 2024 - add the if statement to validate input (ensure valid UUID format)
   public IOU getIOU(UUID id) throws NoSuchElementException {
+    // validate user input to ensure valid UUID format
+    if (id == null) {
+      throw new IllegalArgumentException ("Invalid UUID provided");
+    }
+    // Sanitize input (no need for or sanitization with UUIDs because
+    // UUIDs don’t require sanitization because they are generated and don’t contain user input)
     return iouRepository.findById(id).orElseThrow(() -> new NoSuchElementException("IOU not found"));
   }
 
